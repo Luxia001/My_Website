@@ -1,36 +1,48 @@
 "use client";
-
-import { Cross, Menu } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import React from "react";
+import { useParams, usePathname } from "next/navigation";
 
 function Navbar() {
   const pathName = usePathname();
+  const param = useParams();
   return (
     <div className="navbar bg-slate-200 text-sky-500 shadow-sm px-5">
       <Link
         href="/"
         className={
-          "navbar-start flex gap-5 " +
+          "navbar-start flex gap-5 text-2xl font-bold " +
           (pathName === "/" ? "text-purple-500" : "")
         }
       >
-        <Cross /> หน้าหลัก
+        {" "}
+        Panuwat_V
       </Link>
 
       <div className="navbar-end gap-5">
         <Link
-          href="/patient"
-          className={pathName === "/patient" ? "text-purple-500" : ""}
+          href="#intro"
+          className={param.id === "intro" ? "text-purple-500" : ""}
         >
-          ลงทะเบียนผู้ป่วย
+          Intro
         </Link>
         <Link
-          href="/admin"
-          className={pathName === "/admin" ? "text-purple-500" : ""}
+          href="#skills"
+          className={param.id === "skills" ? "text-purple-500" : ""}
         >
-          เจ้าหน้าที่
+          Skills
+        </Link>
+        <Link
+          href="#experience"
+          className={param.id === "experience" ? "text-purple-500" : ""}
+          transitionTypes={["slide-in"]}
+        >
+          Experience
+        </Link>
+        <Link
+          href="#projects"
+          className={param.id === "projects" ? "text-purple-500" : ""}
+        >
+          Projects
         </Link>
       </div>
     </div>
