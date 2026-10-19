@@ -78,8 +78,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json(newPatient, { status: 201 });
   } catch (error: any) {
-    console.error("POST_PATIENT_ERROR:", error);
-
     // จัดการ Error กรณี Unique Constraint จาก Prisma (เช่น Email ซ้ำ)
     if (error.code === "P2002") {
       return NextResponse.json(

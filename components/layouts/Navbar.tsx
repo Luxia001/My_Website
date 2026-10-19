@@ -1,14 +1,17 @@
 "use client";
 import Link from "next/link";
-import { useParams, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
+import Routing from "./Routing";
+import { Menu, ChevronRight } from "lucide-react";
+import { useState } from "react";
 
 function Navbar() {
   const pathName = usePathname();
-  const param = useParams();
+  const [openMenu, setOpenMenu] = useState(false);
   return (
-    <div className="navbar bg-slate-200 text-sky-500 shadow-sm px-5">
+    <div className="navbar-center navbar bg-slate-200 text-sky-500 shadow-sm flex justify-between">
       <Link
-        href="/"
+        href="#"
         className={
           "navbar-start flex gap-5 text-2xl font-bold " +
           (pathName === "/" ? "text-purple-500" : "")
@@ -18,32 +21,26 @@ function Navbar() {
         Panuwat_V
       </Link>
 
-      <div className="navbar-end gap-5">
-        <Link
-          href="#intro"
-          className={param.id === "intro" ? "text-purple-500" : ""}
+      <div className="navbar-end hidden md:flex">
+        <Routing></Routing>
+      </div>
+      <div className="flex w-full justify-end md:hidden">
+        <button
+          className=" bg-white rounded-full p-2"
+          onClick={() => setOpenMenu(!openMenu)}
         >
-          Intro
-        </Link>
-        <Link
-          href="#skills"
-          className={param.id === "skills" ? "text-purple-500" : ""}
-        >
-          Skills
-        </Link>
-        <Link
-          href="#experience"
-          className={param.id === "experience" ? "text-purple-500" : ""}
-          transitionTypes={["slide-in"]}
-        >
-          Experience
-        </Link>
-        <Link
-          href="#projects"
-          className={param.id === "projects" ? "text-purple-500" : ""}
-        >
-          Projects
-        </Link>
+          {!openMenu ? <Menu /> : <ChevronRight color="#de0d0d" />}
+        </button>
+      </div>
+      <div className="md:hidden ">
+        {openMenu && (
+          <div
+            className="absolute left-0 top-14 bg-white text-end p-5 w-full h-screen"
+            onClick={() => setOpenMenu(!openMenu)}
+          >
+            <Routing classStyle="grid"></Routing>
+          </div>
+        )}
       </div>
     </div>
   );

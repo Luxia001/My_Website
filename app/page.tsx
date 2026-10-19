@@ -156,7 +156,7 @@ export default function Home() {
         id="skills"
       >
         {/* Background Glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-cyan-500/10 blur-3xl rounded-full"></div>
+        <div className="absolute left-0 items-center w-full h-full bg-cyan-500/10 blur-3xl rounded-full"></div>
 
         <div className="relative z-10 max-w-7xl mx-auto">
           {/* Header */}

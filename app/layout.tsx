@@ -28,8 +28,8 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full scroll-smooth`}
     >
-      <body className="min-h-full">
-        <div className="fixed top-0 z-50 w-full">
+      <body className="min-h-full relative">
+        <div className="fixed z-50 w-full">
           <Navbar></Navbar>
         </div>
         <div className="">{children}</div>
