@@ -45,7 +45,9 @@ export const Get_Patients = async () => {
 };
 
 export const Get_Patient_By_Id = async (id: number) => {
-  const response = await fetch(`/api/patient/${id}`);
+  const response = await fetch(`/api/patient/${id}`, {
+    cache: "no-store",
+  });
   const result = await response.json();
 
   if (!response.ok) {
