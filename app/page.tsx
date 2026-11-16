@@ -1,6 +1,6 @@
 "use client";
 
-import CarouselSkills from "@/components/UI/Carousel";
+import CarouselSkills from "@/shared/UI/Carousel";
 import { CircleCheck } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";

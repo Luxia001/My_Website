@@ -32,7 +32,7 @@ export default function RootLayout({
         <div className="fixed z-50 w-full">
           <Navbar></Navbar>
         </div>
-        <div className="">{children}</div>
+        <div className="pt-16">{children}</div>
       </body>
     </html>
   );

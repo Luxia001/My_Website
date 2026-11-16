@@ -12,30 +12,31 @@ function Routing(classStyle: routeingI) {
     <div className={" flex gap-5 " + classStyle.classStyle}>
       {" "}
       <Link
-        href="#intro"
+        href="/#intro"
         className={param.id === "intro" ? "text-purple-500" : ""}
       >
         Intro
       </Link>
       <Link
-        href="#skills"
+        href="/#skills"
         className={param.id === "skills" ? "text-purple-500" : ""}
       >
         Skills
       </Link>
       <Link
-        href="#experience"
+        href="/#experience"
         className={param.id === "experience" ? "text-purple-500" : ""}
         transitionTypes={["slide-in"]}
       >
         Experience
       </Link>
       <Link
-        href="#projects"
+        href="/#projects"
         className={param.id === "projects" ? "text-purple-500" : ""}
       >
         Projects
       </Link>
+      <Link href="/board">Board</Link>
     </div>
   );
 }
