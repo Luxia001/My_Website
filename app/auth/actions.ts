@@ -18,7 +18,7 @@ export type AuthState = {
   phone?: string;
 };
 
-const unavailable = "Something went wrong. Please try again.";
+const unavailable = "ไอ่เหรี้ยแตก!!!ว่ะ";
 
 function readText(data: FormData, field: string) {
   const value = data.get(field);
@@ -72,7 +72,11 @@ export async function signup(
     return { ...fields, error: unavailable };
   }
   const invite = form.get("invite");
-  redirect(validInvite(invite) ? `/login?registered=1&invite=${invite}` : "/login?registered=1");
+  redirect(
+    validInvite(invite)
+      ? `/login?registered=1&invite=${invite}`
+      : "/login?registered=1",
+  );
 }
 
 export async function login(
