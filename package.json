@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && prisma migrate deploy && next build",
+    "build": "prisma generate && next build",
+    "db:push": "prisma db push",
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate"
@@ -12,13 +13,17 @@
   "dependencies": {
     "@prisma/client": "^5.22.0",
     "@supabase/supabase-js": "^2.105.3",
+    "@tanstack/react-query": "^5.107.1",
     "lucide-react": "^1.14.0",
     "next": "16.2.6",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "zod": "^4.6.7",
+    "zustand": "^5.1.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@tanstack/eslint-plugin-query": "^5.107.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

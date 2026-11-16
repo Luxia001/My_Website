@@ -2,19 +2,24 @@
 
 url project https://agnos-seven.vercel.app/
 Framework ที่ใช้งาน NextJs สำหรับทำระบบฝั่ง frontend แสดงส่วน UX/UI และ backend ทำส่วนเชื่อมต่อกับฐานข้อมูลและการสร้าง route API
-ฐานข้อมูลที่ใช้เป็น PostgreSQL ของ supabase ใช้งานการ query ผ่าน Prisma orm
+ฐานข้อมูลสำหรับระบบผู้ป่วยคือ MongoDB เชื่อมต่อผ่าน Prisma ORM
 deploy on vercel
 
 # feature
 - บันทึกข้อมูลการลงทะเบียน พร้อม validate ในการตรวจสอบ input (url[https://agnos-seven.vercel.app/patient])
-- แสดงรายการข้อมูลการลงทะเบียนแบบ real time (url[https://agnos-seven.vercel.app/admin])
+- แสดงรายการข้อมูลการลงทะเบียนและรีเฟรชทุก 5 วินาที (url[https://agnos-seven.vercel.app/admin])
 - รายละเอียดของผู้ทำการลงทะเบียน
 
-ขั้นตอนการติดตั้ง
-1 clone project
-2 npm i ใน project
-3 เพิ่ม env.
-4 npm run dev
+ขั้นตอนการติดตั้ง (รันจากโฟลเดอร์ `fe`)
+
+1. รัน `npm ci`
+2. คัดลอก `.env.example` เป็น `.env` แล้วตั้ง `MONGODB_URI` ให้ชี้ไปยัง MongoDB Atlas หรือ MongoDB ที่ตั้งเป็น replica set โดยใส่ชื่อฐานข้อมูลใน URI ด้วย
+3. รัน `npm run db:push` เพื่อสร้าง collection และ index สำหรับอีเมลที่ห้ามซ้ำ
+4. รัน `npm run dev`
+
+บน Vercel ให้ตั้ง `MONGODB_URI` ใน Environment Variables ฝั่งเซิร์ฟเวอร์ แล้วรัน `npm run db:push` สำหรับฐานข้อมูลปลายทางแยกจากขั้นตอน build
+
+ไฟล์ SQL ใน `prisma/migrations` เป็นประวัติของ PostgreSQL เดิม ข้อมูลเดิมจะไม่ถูกย้ายไป MongoDB อัตโนมัติ
 
 ## Development Planning documentation
 
@@ -23,7 +28,7 @@ deploy on vercel
 app
 
 - page.tsx หน้าแรกแสดงปุ่มกดไปยังหน้าต่างๆในโปรเจกต์
-- admin หน้าแสดงรายชื่อผู้ลงทะเบียนแบบ real time
+- admin หน้าแสดงรายชื่อผู้ลงทะเบียนและรีเฟรชทุก 5 วินาที
 - patient หน้าลงทะเบียนผู้ป่วย
 - patient/[id] หน้ารายละเอียดงทะเบียนผู้ป่วย
 - api ในการเชื่อมต่อ database
@@ -54,9 +59,9 @@ component
 - UI
   - card : card แสดงปกข้อมูล
 
-# Real-Time Synchronization Flow :
+# การอัปเดตรายชื่อผู้ลงทะเบียน
 
-เมื่อลงทะเบียนหน้า patient จะส่งข่อมุลทำงานยัง supabase realtime โดยเลือกให้ table patient ส่งข้อมูลที่ทำการ insert อัตโนมัติไปยังหน้า admin ทันที
+หน้าลงทะเบียนบันทึกข้อมูลผ่าน `/api/patient` ลง MongoDB และหน้า admin เรียก API เดียวกันทุก 5 วินาทีเพื่ออัปเดตรายชื่อ
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
