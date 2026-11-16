@@ -1,4 +1,3 @@
-
 // prisma/schema.prisma
 
 generator client {
@@ -6,12 +5,13 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
-  url      = env("MONGODB_URI")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  id           String    @id @default(uuid())
   user         String
   email        String    @unique
   passwordHash String
@@ -46,35 +46,35 @@ enum CashStatus {
 }
 
 model ProjectCashTransaction {
-  id          String     @id @default(auto()) @map("_id") @db.ObjectId
-  projectId   String     @db.ObjectId
-  userId      String     @db.ObjectId
+  id          String     @id @default(uuid())
+  projectId   String
+  userId      String
   type        CashType
   status      CashStatus
   amount      Int
   createdAt   DateTime   @default(now())
   completedAt DateTime?
-  processedBy String?   @db.ObjectId
+  processedBy String?
 
   @@index([projectId, userId, createdAt])
   @@index([projectId, status])
 }
 
 model ProjectCashBalance {
-  id        String @id @default(auto()) @map("_id") @db.ObjectId
-  projectId String @db.ObjectId
-  userId    String @db.ObjectId
+  id        String @id @default(uuid())
+  projectId String
+  userId    String
   amount    BigInt
 
   @@unique([projectId, userId])
 }
 
 model Project {
-  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  id          String      @id @default(uuid())
   name        String
   description String
   ownerRole   ProjectRole @default(owner)
-  ownerId     String      @db.ObjectId
+  ownerId     String
   owner       User        @relation(fields: [ownerId], references: [id])
   createdAt   DateTime    @default(now())
   startsAt    DateTime?
@@ -85,9 +85,9 @@ model Project {
 }
 
 model ProjectMember {
-  id        String     @id @default(auto()) @map("_id") @db.ObjectId
-  projectId String     @db.ObjectId
-  userId    String     @db.ObjectId
+  id        String     @id @default(uuid())
+  projectId String
+  userId    String
   role      MemberRole @default(member)
 
   @@unique([projectId, userId])
@@ -95,21 +95,26 @@ model ProjectMember {
 }
 
 model ProjectInvite {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  projectId String   @unique @db.ObjectId
+  id        String   @id @default(uuid())
+  projectId String   @unique
   tokenHash String   @unique
   expiresAt DateTime
 }
 
-type ProjectPrice {
-  amount Int
-  at     DateTime
-  units  Float?
+model ProjectPrice {
+  id      Int          @id @default(autoincrement())
+  assetId String
+  asset   ProjectAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  amount  Int
+  at      DateTime
+  units   Float?
+
+  @@index([assetId, at])
 }
 
 model ProjectAsset {
-  id        String         @id @default(auto()) @map("_id") @db.ObjectId
-  projectId String         @db.ObjectId
+  id        String         @id @default(uuid())
+  projectId String
   name      String
   prices    ProjectPrice[]
 
@@ -117,25 +122,25 @@ model ProjectAsset {
 }
 
 model Investment {
-  id         String           @id @default(auto()) @map("_id") @db.ObjectId
-  projectId  String           @db.ObjectId
-  userId     String           @db.ObjectId
-  assetId    String           @db.ObjectId
+  id         String           @id @default(uuid())
+  projectId  String
+  userId     String
+  assetId    String
   cost       Int
   unitPrice  Int
   status     InvestmentStatus @default(pending)
   createdAt  DateTime         @default(now())
   reviewedAt DateTime?
-  reviewerId String?          @db.ObjectId
+  reviewerId String?
 
   @@index([projectId, status])
   @@index([projectId, userId])
 }
 
 model ProjectBankAccount {
-  id        String @id @default(auto()) @map("_id") @db.ObjectId
-  projectId String @db.ObjectId
-  userId    String @db.ObjectId
+  id        String @id @default(uuid())
+  projectId String
+  userId    String
   bank      String
   encrypted String
   lastFour  String
@@ -144,10 +149,10 @@ model ProjectBankAccount {
 }
 
 model Session {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(uuid())
   tokenHash String   @unique
   expiresAt DateTime
-  userId    String   @db.ObjectId
+  userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])

@@ -2,7 +2,7 @@
 
 url project https://agnos-seven.vercel.app/
 Framework ที่ใช้งาน NextJs สำหรับทำระบบฝั่ง frontend แสดงส่วน UX/UI และ backend ทำส่วนเชื่อมต่อกับฐานข้อมูลและการสร้าง route API
-ฐานข้อมูลสำหรับระบบผู้ป่วยคือ MongoDB เชื่อมต่อผ่าน Prisma ORM
+ระบบแผนลงทุนใช้ Supabase PostgreSQL ผ่าน Prisma ORM
 deploy on vercel
 
 # feature
@@ -13,13 +13,13 @@ deploy on vercel
 ขั้นตอนการติดตั้ง (รันจากโฟลเดอร์ `fe`)
 
 1. รัน `npm ci`
-2. คัดลอก `.env.example` เป็น `.env` แล้วตั้ง `MONGODB_URI` ให้ชี้ไปยัง MongoDB Atlas หรือ MongoDB ที่ตั้งเป็น replica set โดยใส่ชื่อฐานข้อมูลใน URI ด้วย
-3. รัน `npm run db:push` เพื่อสร้าง collection และ index สำหรับอีเมลที่ห้ามซ้ำ
+2. ตั้ง `DATABASE_URL` จาก Supabase Connect → Transaction pooler (6543) และ `DIRECT_URL` จาก Session pooler (5432) ตาม `.env.example` โดยทั้งคู่ใช้ `schema=travel_trade`
+3. รัน `npm run db:migrate` เพื่อสร้างตารางผ่าน Prisma
 4. รัน `npm run dev`
 
-บน Vercel ให้ตั้ง `MONGODB_URI` ใน Environment Variables ฝั่งเซิร์ฟเวอร์ แล้วรัน `npm run db:push` สำหรับฐานข้อมูลปลายทางแยกจากขั้นตอน build
+บน Vercel ให้ตั้ง `DATABASE_URL`, `DIRECT_URL` และ `PROJECT_BANK_KEY` ใน Environment Variables ของ Production แล้ว redeploy สามารถตรวจการเชื่อมต่อผ่าน `GET /api/test` หลัง deploy
 
-ไฟล์ SQL ใน `prisma/migrations` เป็นประวัติของ PostgreSQL เดิม ข้อมูลเดิมจะไม่ถูกย้ายไป MongoDB อัตโนมัติ
+ข้อมูลจาก MongoDB เดิมต้องย้ายแยกต่างหาก ไฟล์ migration ของระบบผู้ป่วยรุ่นเดิมอยู่ที่ `prisma/legacy-migrations`
 
 ## Development Planning documentation
 
@@ -58,10 +58,6 @@ component
   - Navbar : แสดง Navigate bar ใช้ในการนำทางเข้าถึงหน้าต่างๆ
 - UI
   - card : card แสดงปกข้อมูล
-
-# การอัปเดตรายชื่อผู้ลงทะเบียน
-
-หน้าลงทะเบียนบันทึกข้อมูลผ่าน `/api/patient` ลง MongoDB และหน้า admin เรียก API เดียวกันทุก 5 วินาทีเพื่ออัปเดตรายชื่อ
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 

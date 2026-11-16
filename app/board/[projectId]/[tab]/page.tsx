@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChartLine, CircleUserRound, Settings2, UsersRound } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { portfolioPrices } from "@/lib/portfolio";
 import { projectPath, requireProject, type ProjectTab } from "@/lib/projects";
 import Overview from "./Overview";
 import { LegacyInvestments, Members, Settings } from "./Panels";
@@ -33,7 +34,9 @@ async function ProjectSection({ tab, context }: {
     return <Members id={projectId} role={role} owner={project.ownerId} members={members} users={users} />;
   }
 
-  const assetsQuery = prisma.projectAsset.findMany({ where: { projectId }, orderBy: { name: "asc" } });
+  const assetsQuery = prisma.projectAsset.findMany({
+    where: { projectId }, orderBy: { name: "asc" }, include: { prices: portfolioPrices },
+  });
   if (tab === "settings") return <Settings project={project} assets={await assetsQuery} canManage={canManage} />;
 
   if (tab === "personal") {

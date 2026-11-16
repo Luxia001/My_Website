@@ -4,7 +4,7 @@ import { createCipheriv, randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { inviteHash, objectId, projectPath, projectTabs, requireProject, toSatang } from "@/lib/projects";
+import { inviteHash, projectPath, projectTabs, requireProject, toSatang, validRecordId } from "@/lib/projects";
 import { portfolioMonth } from "@/lib/portfolio";
 
 type ActionState = { error?: string; invite?: string };
@@ -70,12 +70,17 @@ export async function updateProject(
         if (!name || name.length > 100 || price === null || units === null) {
           return { error: "ระบุชื่อ ราคาต่อหน่วย และจำนวนหน่วยที่ถูกต้อง" };
         }
-        await prisma.projectAsset.create({ data: { projectId, name, prices: [{ amount: price, units, at: new Date() }] } });
+        await prisma.projectAsset.create({
+          data: { projectId, name, prices: { create: { amount: price, units, at: new Date() } } },
+        });
         break;
       }
       case "price": {
-        if (!objectId(assetId) || price === null || !name || name.length > 100) return { error: "ตรวจสอบชื่อและราคาต่อหน่วย" };
-        const asset = await prisma.projectAsset.findFirst({ where: { id: assetId, projectId } });
+        if (!validRecordId(assetId) || price === null || !name || name.length > 100) return { error: "ตรวจสอบชื่อและราคาต่อหน่วย" };
+        const asset = await prisma.projectAsset.findFirst({
+          where: { id: assetId, projectId },
+          include: { prices: { take: 1, orderBy: [{ at: "desc" }, { id: "desc" }] } },
+        });
         if (!asset) return { error: "ไม่พบรายการลงทุน" };
         const previous = asset.prices.at(-1);
         const unitsField = read(form, "units");
@@ -86,7 +91,7 @@ export async function updateProject(
           || (units !== null && portfolioMonth(previous.at) !== portfolioMonth(at));
         await prisma.projectAsset.update({
           where: { id: assetId, projectId },
-          data: { name, ...(record ? { prices: { push: { amount: price, units, at } } } : {}) },
+          data: { name, ...(record ? { prices: { create: { amount: price, units, at } } } : {}) },
         });
         break;
       }
@@ -112,7 +117,7 @@ export async function updateProject(
       }
       case "approveDeposit": {
         const transactionId = read(form, "transactionId");
-        if (!objectId(transactionId)) return { error: "รายการฝากเงินไม่ถูกต้อง" };
+        if (!validRecordId(transactionId)) return { error: "รายการฝากเงินไม่ถูกต้อง" };
         const approved = await prisma.$transaction(async (tx) => {
           const where = { id: transactionId, projectId, type: "deposit" as const, status: "pending" as const };
           const deposit = await tx.projectCashTransaction.findFirst({ where });
@@ -135,7 +140,7 @@ export async function updateProject(
       case "refund": {
         const recipient = read(form, "recipient");
         const amount = toSatang(read(form, "amount"));
-        if (!objectId(recipient) || amount === null) return { error: "เลือกสมาชิกและกรอกจำนวนเงินให้ถูกต้อง" };
+        if (!validRecordId(recipient) || amount === null) return { error: "เลือกสมาชิกและกรอกจำนวนเงินให้ถูกต้อง" };
         const completed = await prisma.$transaction(async (tx) => {
           const balance = await tx.projectCashBalance.updateMany({
             where: { projectId, userId: recipient, amount: { gte: BigInt(amount) } },
@@ -156,7 +161,7 @@ export async function updateProject(
       case "review": {
         const id = read(form, "investmentId");
         const status = read(form, "decision");
-        if (!objectId(id) || (status !== "approved" && status !== "rejected")) return { error: "รายการอนุมัติไม่ถูกต้อง" };
+        if (!validRecordId(id) || (status !== "approved" && status !== "rejected")) return { error: "รายการอนุมัติไม่ถูกต้อง" };
         if (!(await prisma.investment.updateMany({
           where: { id, projectId, status: "pending" },
           data: { status, reviewerId: user.id, reviewedAt: new Date() },
@@ -172,7 +177,7 @@ export async function updateProject(
       case "remove":
       case "role": {
         const id = read(form, "membershipId");
-        if (!objectId(id) || (operation === "role" && role !== "owner")) return denied;
+        if (!validRecordId(id) || (operation === "role" && role !== "owner")) return denied;
         if (operation === "remove") {
           await prisma.$transaction(async (tx) => {
             const removed = await tx.projectMember.deleteMany({

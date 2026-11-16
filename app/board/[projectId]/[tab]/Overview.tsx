@@ -1,6 +1,6 @@
-import type { Investment, ProjectAsset, ProjectCashTransaction } from "@prisma/client";
+import type { Investment, ProjectCashTransaction } from "@prisma/client";
 import { baht, thaiDate } from "@/lib/projects";
-import { portfolioReport } from "@/lib/portfolio";
+import { portfolioReport, type AssetWithPrices } from "@/lib/portfolio";
 
 const unitsFormat = new Intl.NumberFormat("th-TH", { maximumFractionDigits: 6 });
 const monthLabel = new Intl.DateTimeFormat("th-TH", {
@@ -10,7 +10,7 @@ const changePercent = new Intl.NumberFormat("th-TH", {
   style: "percent", signDisplay: "exceptZero", maximumFractionDigits: 2,
 });
 
-function Portfolio({ assets, report }: { assets: ProjectAsset[]; report: ReturnType<typeof portfolioReport> }) {
+function Portfolio({ assets, report }: { assets: AssetWithPrices[]; report: ReturnType<typeof portfolioReport> }) {
   const { total, holdings, months } = report;
   const byAsset = new Map(holdings.map((entry) => [entry.id, entry]));
   const latest = months.at(-1);
@@ -70,7 +70,7 @@ function Portfolio({ assets, report }: { assets: ProjectAsset[]; report: ReturnT
   );
 }
 
-function valueAt(rows: Investment[], assets: Map<string, ProjectAsset>, at: number) {
+function valueAt(rows: Investment[], assets: Map<string, AssetWithPrices>, at: number) {
   const prices = new Map([...assets].map(([id, asset]) =>
     [id, asset.prices.findLast((price) => +price.at <= at)?.amount] as const,
   ));
@@ -107,7 +107,7 @@ function ValueChart({ points }: { points: { day: number; value: number }[] }) {
 }
 
 export default function Overview({ rows, assets, users, cash, budget, startsAt, endsAt }: {
-  rows: Investment[]; assets: ProjectAsset[]; users: Map<string, string>; cash: ProjectCashTransaction[];
+  rows: Investment[]; assets: AssetWithPrices[]; users: Map<string, string>; cash: ProjectCashTransaction[];
   budget: number | null; startsAt: Date | null; endsAt: Date | null;
 }) {
   const report = portfolioReport(assets);

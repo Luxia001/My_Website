@@ -1,4 +1,5 @@
-import type { Project, ProjectAsset, Investment } from "@prisma/client";
+import type { Project, Investment } from "@prisma/client";
+import type { AssetWithPrices } from "@/lib/portfolio";
 import type { ReactNode } from "react";
 import { baht, inputDate, thaiDate } from "@/lib/projects";
 import { ProjectAction } from "./ProjectForms";
@@ -58,7 +59,7 @@ export function Settings({
   canManage,
 }: {
   project: Project;
-  assets: ProjectAsset[];
+  assets: AssetWithPrices[];
   canManage: boolean;
 }) {
   const id = project.id;
@@ -203,7 +204,7 @@ export function LegacyInvestments({
   pending,
 }: {
   id: string;
-  assets: ProjectAsset[];
+  assets: AssetWithPrices[];
   rows: Investment[];
   pending?: { rows: Investment[]; users: Map<string, string> };
 }) {

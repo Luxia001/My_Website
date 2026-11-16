@@ -1,11 +1,17 @@
-import type { ProjectAsset } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
+
+export const portfolioPrices = {
+  orderBy: [{ at: "asc" }, { id: "asc" }],
+} satisfies Prisma.ProjectAsset$pricesArgs;
+
+export type AssetWithPrices = Prisma.ProjectAssetGetPayload<{ include: { prices: true } }>;
 
 const monthFormat = new Intl.DateTimeFormat("sv-SE", {
   timeZone: "Asia/Bangkok", calendar: "gregory", year: "numeric", month: "2-digit",
 });
 export const portfolioMonth = (date: Date) => monthFormat.format(date);
 
-export function portfolioReport(assets: ProjectAsset[]) {
+export function portfolioReport(assets: AssetWithPrices[]) {
   const entries = assets.flatMap((asset) =>
     asset.prices.flatMap(({ at, amount, units }) => units == null ? [] : [{
       id: asset.id, at, units, value: Math.round(amount * units),

@@ -11,14 +11,14 @@ export function projectPath(id: string, tab: ProjectTab = "overview") {
   return `/board/${id}/${tab}`;
 }
 
-export function objectId(value: string) {
-  return /^[a-f0-9]{24}$/.test(value);
+export function validRecordId(value: string) {
+  return /^(?:[a-f0-9]{24}|[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12})$/i.test(value);
 }
 
 export const requireProject = cache(async (id: string) => {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
-  if (!objectId(id)) notFound();
+  if (!validRecordId(id)) notFound();
   const project = await prisma.project.findUnique({ where: { id } });
   if (!project) notFound();
 
