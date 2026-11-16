@@ -1,4 +1,4 @@
-import Card from "@/components/UI/card";
+import Card from "@/shared/UI/card";
 import React from "react";
 
 const tech = [
